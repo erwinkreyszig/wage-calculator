@@ -19,6 +19,14 @@ class State(rx.State):
         if not self.logged_in:
             return rx.redirect("/login")
 
+    @rx.event
+    def go_to_main(self):
+        return rx.redirect("/main")
+
+    @rx.event
+    def go_to_records(self):
+        return rx.redirect("/records")
+
     @rx.var
     def logged_in(self) -> bool:
         return self.user is not None

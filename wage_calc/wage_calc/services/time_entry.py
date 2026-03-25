@@ -5,14 +5,16 @@ from wage_calc.models import Account, TimeRecord
 from wage_calc.repositories.time_entry import (
     create_time_record,
     get_time_record_by_id,
+    get_time_records_between_range,
     get_time_records_for_day,
+    get_time_records_for_month,
     update_time_record,
 )
 
 
 def get_data_for_date(user: Account, date_obj: datetime) -> list[TimeRecord]:
     with rx.session() as session:
-        time_records = get_time_records_for_day(session, user.id, date_obj)
+        time_records, _ = get_time_records_for_day(session, user.id, date_obj)
     return time_records
 
 
@@ -97,3 +99,30 @@ def update_time_entry(time_record: TimeRecord, form_data: dict) -> TimeRecord:
             session.rollback()
             raise e
     return updated_time_record
+
+
+def get_time_entry_records(
+    user: Account, start_date: datetime, end_date: datetime, limit: int, offset: int
+) -> tuple[list[TimeRecord], int]:
+    with rx.session() as session:
+        time_records, record_count = get_time_records_between_range(
+            session, user.id, start_date, end_date, limit, offset
+        )
+    return time_records, record_count
+
+
+def get_totals_for_month(user: Account, date_obj: datetime) -> dict:
+    with rx.session() as session:
+        time_records, record_count = get_time_records_for_month(
+            session, user.id, date_obj
+        )
+    minutes_list = []
+    amounts_list = []
+    for time_record in time_records:
+        minutes_list.append(time_record.total_time_minutes or 0)
+        amounts_list.append(time_record.amount_earned or 0)
+    return {
+        "num_days": record_count,
+        "total_hours": round(sum(minutes_list) / 60.0, 2),
+        "total_amount": round(sum(amounts_list), 2),
+    }
