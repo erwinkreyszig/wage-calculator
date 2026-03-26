@@ -81,7 +81,7 @@ class SpeedDialHorizontal(rx.ComponentState):
         def menu() -> rx.Component:
             return rx.hstack(
                 menu_item("log_out", "Logout", State.logout),
-                menu_item("settings", "Settings", State.logout),
+                # menu_item("settings", "Settings", State.logout),
                 rx.match(
                     props.pop("page"),
                     (
