@@ -1,0 +1,20 @@
+services:
+  web:
+    build: .
+    container_name: wc_app
+    restart: always
+    # This maps the .env file variables into the container environment
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    command: reflex run
+    ports:
+      - "3000:3000"  # Frontend
+      - "8400:8000"  # Backend API
+    networks:
+      - vocab_default
+
+networks:
+  vocab_default:
+    external: true
