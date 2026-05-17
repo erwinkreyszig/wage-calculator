@@ -94,7 +94,9 @@ class RecordState(State):
         self.form_disabled = form_error != ""
 
     def __get_date_object(self, date_str: str) -> datetime:
-        return datetime.strptime(date_str, "%Y-%m-%d")
+        return datetime.strptime(date_str, "%Y-%m-%d").replace(
+            tzinfo=ZoneInfo(self.user.settings.timezone)
+        )
 
     @rx.event
     def on_load_button_click(self):
@@ -109,8 +111,8 @@ class RecordState(State):
         )
         rows, self.total_rows = get_time_entry_records(
             self.user,
-            self.__get_date_object(self.start_date),
-            self.__get_date_object(self.end_date),
+            self.__get_date_object(self.start_date).astimezone(ZoneInfo("UTC")),
+            self.__get_date_object(self.end_date).astimezone(ZoneInfo("UTC")),
             self.limit,
             self.offset,
         )

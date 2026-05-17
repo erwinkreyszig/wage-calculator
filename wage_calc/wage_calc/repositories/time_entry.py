@@ -71,13 +71,10 @@ def get_time_records(
         the list of TimeRecord objects that match the filtering criteria, and
         the number of matching rows
     """
-    in_start_ts_range = (TimeRecord.start_ts >= start_timestamp) & (
-        TimeRecord.start_ts <= end_timestamp
-    )
-    in_end_ts_range = (TimeRecord.end_ts >= start_timestamp) & (
+    in_range = (TimeRecord.start_ts >= start_timestamp) & (
         TimeRecord.end_ts <= end_timestamp
     )
-    conditions = (TimeRecord.user_id == user_id) & (in_start_ts_range | in_end_ts_range)
+    conditions = (TimeRecord.user_id == user_id) & (in_range)
     statement = select(TimeRecord).where(conditions)
     if offset:
         statement = statement.offset(offset)
